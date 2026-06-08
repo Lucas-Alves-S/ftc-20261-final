@@ -1,0 +1,418 @@
+namespace Parte3;
+
+// Modela a 7-tupla M = (Q, Σ, Γ, δ, q0, qaccept, qreject)
+class MT
+{
+    private readonly HashSet<string> _q;
+    private readonly HashSet<char> _sigma;
+    private readonly HashSet<char> _gamma;
+    private readonly Dictionary<
+        (string estado, char simbolo),
+        (string novoEstado, char novoSimbolo, char direcao)
+    > _delta;
+    private readonly string _q0;
+    private readonly string _qaccept;
+    private readonly string _qreject;
+    private readonly int _limitePassos;
+
+    public const char Branco = '_';
+
+    public IReadOnlySet<string> Q => _q;
+    public IReadOnlySet<char> Sigma => _sigma;
+    public IReadOnlySet<char> Gamma => _gamma;
+    public IReadOnlyDictionary<
+        (string estado, char simbolo),
+        (string novoEstado, char novoSimbolo, char direcao)
+    > Delta => _delta;
+    public string Q0 => _q0;
+    public string Qaccept => _qaccept;
+    public string Qreject => _qreject;
+    public int LimitePassos => _limitePassos;
+
+    // Sem configuração → fallback L4 = { aⁿbⁿcⁿ | n ≥ 1 }
+    public MT()
+        : this(ConfiguracaoL4Padrao()) { }
+
+    public MT(MTConfig config)
+    {
+        _q = new HashSet<string>(config.Estados);
+        _sigma = new HashSet<char>(
+            config.AlfabetoEntrada.Where(s => s.Length == 1).Select(s => s[0])
+        );
+        _gamma = new HashSet<char>(config.AlfabetoFita.Where(s => s.Length == 1).Select(s => s[0]));
+        _delta = [];
+        _q0 = config.EstadoInicial;
+        _qaccept = config.EstadoAceitacao;
+        _qreject = config.EstadoRejeicao;
+        _limitePassos = config.LimitePassos > 0 ? config.LimitePassos : 1000;
+
+        foreach (var t in config.Transicoes)
+            if (t.Simbolo.Length == 1 && t.NovoSimbolo.Length == 1 && t.Direcao.Length == 1)
+                _delta[(t.Origem, t.Simbolo[0])] = (t.NovoEstado, t.NovoSimbolo[0], t.Direcao[0]);
+    }
+
+    private static MTConfig ConfiguracaoL4Padrao() =>
+        new()
+        {
+            Estados = ["q0", "q1", "q2", "q3", "q4", "qaccept", "qreject"],
+            AlfabetoEntrada = ["a", "b", "c"],
+            AlfabetoFita = ["a", "b", "c", "A", "B", "C", "_"],
+            EstadoInicial = "q0",
+            EstadoAceitacao = "qaccept",
+            EstadoRejeicao = "qreject",
+            LimitePassos = 10000,
+            Transicoes =
+            [
+                // q0: varre à direita procurando 'a' não marcado
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "A",
+                    NovoEstado = "q0",
+                    NovoSimbolo = "A",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "a",
+                    NovoEstado = "q1",
+                    NovoSimbolo = "A",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "B",
+                    NovoEstado = "q4",
+                    NovoSimbolo = "B",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "_",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "_",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "b",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "b",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "c",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "c",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q0",
+                    Simbolo = "C",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "C",
+                    Direcao = "R",
+                },
+                // q1: marcou a→A; varre à direita procurando 'b' não marcado
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "a",
+                    NovoEstado = "q1",
+                    NovoSimbolo = "a",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "B",
+                    NovoEstado = "q1",
+                    NovoSimbolo = "B",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "b",
+                    NovoEstado = "q2",
+                    NovoSimbolo = "B",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "c",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "c",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "C",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "C",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q1",
+                    Simbolo = "_",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "_",
+                    Direcao = "R",
+                },
+                // q2: marcou b→B; varre à direita procurando 'c' não marcado
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "b",
+                    NovoEstado = "q2",
+                    NovoSimbolo = "b",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "C",
+                    NovoEstado = "q2",
+                    NovoSimbolo = "C",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "c",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "C",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "a",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "a",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "A",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "A",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q2",
+                    Simbolo = "_",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "_",
+                    Direcao = "R",
+                },
+                // q3: marcou c→C; varre à esquerda de volta ao branco inicial
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "C",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "C",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "c",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "c",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "B",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "B",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "b",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "b",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "A",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "A",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "a",
+                    NovoEstado = "q3",
+                    NovoSimbolo = "a",
+                    Direcao = "L",
+                },
+                new()
+                {
+                    Origem = "q3",
+                    Simbolo = "_",
+                    NovoEstado = "q0",
+                    NovoSimbolo = "_",
+                    Direcao = "R",
+                },
+                // q4: sem mais a's; verifica que só restam B's, C's e branco
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "B",
+                    NovoEstado = "q4",
+                    NovoSimbolo = "B",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "C",
+                    NovoEstado = "q4",
+                    NovoSimbolo = "C",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "_",
+                    NovoEstado = "qaccept",
+                    NovoSimbolo = "_",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "b",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "b",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "c",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "c",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "a",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "a",
+                    Direcao = "R",
+                },
+                new()
+                {
+                    Origem = "q4",
+                    Simbolo = "A",
+                    NovoEstado = "qreject",
+                    NovoSimbolo = "A",
+                    Direcao = "R",
+                },
+            ],
+        };
+
+    public bool Aceitar(string cadeia)
+    {
+        // TODO: Implementar o loop de simulação da Máquina de Turing.
+        //
+        // 1. Inicializar a fita (Dictionary<int, char>) com os caracteres de `cadeia`
+        //    nas posições 0..cadeia.Length-1. Posições não presentes no dicionário
+        //    são tratadas como Branco ('_').
+        //
+        // 2. Inicializar: estadoAtual = _q0, cabecote = 0, passos = 0.
+        //
+        // 3. Loop principal:
+        //    a. Chamar ExibirPasso(passos, estadoAtual, fita, cabecote) para exibir o passo atual.
+        //    b. Se estadoAtual == _qaccept ou _qreject, sair do loop (máquina parou).
+        //    c. Se passos >= _limitePassos, imprimir mensagem de limite atingido e retornar false.
+        //    d. Ler o símbolo atual da fita em `cabecote` (usar Branco se ausente).
+        //    e. Buscar a transição em _delta para (estadoAtual, simboloAtual).
+        //       Se não existir, imprimir mensagem de rejeição implícita e retornar false.
+        //    f. Aplicar a transição: escrever novoSimbolo na fita, atualizar estadoAtual,
+        //       mover cabecote +1 (direção 'R') ou -1 (direção 'L'), incrementar passos.
+        //
+        // 4. Após o loop, imprimir "ACEITA" ou "REJEITA" e retornar (estadoAtual == _qaccept).
+        throw new NotImplementedException("TODO: Aceitar");
+    }
+
+    private static void ExibirPasso(
+        int passo,
+        string estado,
+        Dictionary<int, char> fita,
+        int cabecote
+    )
+    {
+        // TODO: Exibir o estado atual da simulação em uma linha.
+        //
+        // Chamar MontarFita(fita, cabecote) para obter a representação visual da fita.
+        // Imprimir no formato:
+        //   "  Passo {passo,4}: estado={estado,-10} fita={conteudoFita,-40} cabeçote={cabecote}"
+        throw new NotImplementedException("TODO: ExibirPasso");
+    }
+
+    private static string MontarFita(Dictionary<int, char> fita, int cabecote)
+    {
+        // TODO: Construir e retornar a representação visual da fita como string.
+        //
+        // Caso especial: fita vazia (Count == 0) e cabecote == 0 → retornar "[_]".
+        //
+        // Caso geral:
+        // - Calcular min = menor entre as chaves da fita e cabecote.
+        // - Calcular max = maior entre as chaves da fita e cabecote.
+        // - Iterar de min a max; para cada posição i:
+        //     * Ler o char da fita (Branco se ausente).
+        //     * Se i == cabecote, formatar como "[c]"; caso contrário, como "c".
+        // - Retornar todas as partes unidas por espaço.
+        throw new NotImplementedException("TODO: MontarFita");
+    }
+
+    public void ExibirDiagrama()
+    {
+        // TODO: Imprimir a tabela de transições δ formatada como ASCII.
+        //
+        // 1. Ordenar _q (estados) e _gamma (símbolos de fita) alfabeticamente.
+        //
+        // 2. Calcular larguras de coluna:
+        //    - larguraCelula = max(tamanho do maior nome de estado + 5, 12)
+        //    - larguraEstado = tamanho do maior nome de estado + 5
+        //
+        // 3. Imprimir cabeçalho:
+        //    - Linha: "Estado" preenchido à direita até larguraEstado, depois "| " e cada símbolo
+        //      separado por " | ", cada um preenchido até larguraCelula.
+        //    - Separador: traços de larguraEstado + "+" + traços intercalados com "-+-".
+        //
+        // 4. Para cada estado, imprimir uma linha com:
+        //    - Marcador "→ " se é _q0, "  " caso contrário; "* " se é _qaccept, "  " caso contrário.
+        //    - Nome do estado preenchido até larguraEstado.
+        //    - Para cada símbolo: se existe transição em _delta, exibir "(novoEstado,novoSimbolo,direcao)"
+        //      preenchido até larguraCelula; senão exibir "-" preenchido até larguraCelula.
+        //    - Colunas separadas por " | ".
+        //
+        // 5. Imprimir legenda: "  →  = estado inicial     *  = estado de aceitação"
+        throw new NotImplementedException("TODO: ExibirDiagrama");
+    }
+}

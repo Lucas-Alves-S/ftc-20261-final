@@ -1,0 +1,13 @@
+{
+  "estados": ["q0", "qaccept", "qreject"],
+  "alfabetoEntrada": ["1"],
+  "alfabetoFita": ["1", "_"],
+  "estadoInicial": "q0",
+  "estadoAceitacao": "qaccept",
+  "estadoRejeicao": "qreject",
+  "limitePassos": 10000,
+  "transicoes": [
+    { "origem": "q0", "simbolo": "1", "novoEstado": "q0",      "novoSimbolo": "1", "direcao": "R" },
+    { "origem": "q0", "simbolo": "_", "novoEstado": "qaccept", "novoSimbolo": "1", "direcao": "R" }
+  ]
+}

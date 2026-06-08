@@ -1,0 +1,48 @@
+{
+  "estados": ["q0", "q1", "q2", "q3", "q4", "qaccept", "qreject"],
+  "alfabetoEntrada": ["a", "b", "c"],
+  "alfabetoFita": ["a", "b", "c", "A", "B", "C", "_"],
+  "estadoInicial": "q0",
+  "estadoAceitacao": "qaccept",
+  "estadoRejeicao": "qreject",
+  "limitePassos": 10000,
+  "transicoes": [
+    { "origem": "q0", "simbolo": "A", "novoEstado": "q0",      "novoSimbolo": "A", "direcao": "R" },
+    { "origem": "q0", "simbolo": "a", "novoEstado": "q1",      "novoSimbolo": "A", "direcao": "R" },
+    { "origem": "q0", "simbolo": "B", "novoEstado": "q4",      "novoSimbolo": "B", "direcao": "R" },
+    { "origem": "q0", "simbolo": "_", "novoEstado": "qreject", "novoSimbolo": "_", "direcao": "R" },
+    { "origem": "q0", "simbolo": "b", "novoEstado": "qreject", "novoSimbolo": "b", "direcao": "R" },
+    { "origem": "q0", "simbolo": "c", "novoEstado": "qreject", "novoSimbolo": "c", "direcao": "R" },
+    { "origem": "q0", "simbolo": "C", "novoEstado": "qreject", "novoSimbolo": "C", "direcao": "R" },
+
+    { "origem": "q1", "simbolo": "a", "novoEstado": "q1",      "novoSimbolo": "a", "direcao": "R" },
+    { "origem": "q1", "simbolo": "B", "novoEstado": "q1",      "novoSimbolo": "B", "direcao": "R" },
+    { "origem": "q1", "simbolo": "b", "novoEstado": "q2",      "novoSimbolo": "B", "direcao": "R" },
+    { "origem": "q1", "simbolo": "c", "novoEstado": "qreject", "novoSimbolo": "c", "direcao": "R" },
+    { "origem": "q1", "simbolo": "C", "novoEstado": "qreject", "novoSimbolo": "C", "direcao": "R" },
+    { "origem": "q1", "simbolo": "_", "novoEstado": "qreject", "novoSimbolo": "_", "direcao": "R" },
+
+    { "origem": "q2", "simbolo": "b", "novoEstado": "q2",      "novoSimbolo": "b", "direcao": "R" },
+    { "origem": "q2", "simbolo": "C", "novoEstado": "q2",      "novoSimbolo": "C", "direcao": "R" },
+    { "origem": "q2", "simbolo": "c", "novoEstado": "q3",      "novoSimbolo": "C", "direcao": "L" },
+    { "origem": "q2", "simbolo": "a", "novoEstado": "qreject", "novoSimbolo": "a", "direcao": "R" },
+    { "origem": "q2", "simbolo": "A", "novoEstado": "qreject", "novoSimbolo": "A", "direcao": "R" },
+    { "origem": "q2", "simbolo": "_", "novoEstado": "qreject", "novoSimbolo": "_", "direcao": "R" },
+
+    { "origem": "q3", "simbolo": "C", "novoEstado": "q3",      "novoSimbolo": "C", "direcao": "L" },
+    { "origem": "q3", "simbolo": "c", "novoEstado": "q3",      "novoSimbolo": "c", "direcao": "L" },
+    { "origem": "q3", "simbolo": "B", "novoEstado": "q3",      "novoSimbolo": "B", "direcao": "L" },
+    { "origem": "q3", "simbolo": "b", "novoEstado": "q3",      "novoSimbolo": "b", "direcao": "L" },
+    { "origem": "q3", "simbolo": "A", "novoEstado": "q3",      "novoSimbolo": "A", "direcao": "L" },
+    { "origem": "q3", "simbolo": "a", "novoEstado": "q3",      "novoSimbolo": "a", "direcao": "L" },
+    { "origem": "q3", "simbolo": "_", "novoEstado": "q0",      "novoSimbolo": "_", "direcao": "R" },
+
+    { "origem": "q4", "simbolo": "B", "novoEstado": "q4",       "novoSimbolo": "B", "direcao": "R" },
+    { "origem": "q4", "simbolo": "C", "novoEstado": "q4",       "novoSimbolo": "C", "direcao": "R" },
+    { "origem": "q4", "simbolo": "_", "novoEstado": "qaccept",  "novoSimbolo": "_", "direcao": "R" },
+    { "origem": "q4", "simbolo": "b", "novoEstado": "qreject",  "novoSimbolo": "b", "direcao": "R" },
+    { "origem": "q4", "simbolo": "c", "novoEstado": "qreject",  "novoSimbolo": "c", "direcao": "R" },
+    { "origem": "q4", "simbolo": "a", "novoEstado": "qreject",  "novoSimbolo": "a", "direcao": "R" },
+    { "origem": "q4", "simbolo": "A", "novoEstado": "qreject",  "novoSimbolo": "A", "direcao": "R" }
+  ]
+}
