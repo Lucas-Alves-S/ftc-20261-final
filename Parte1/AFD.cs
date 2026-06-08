@@ -79,4 +79,74 @@ class AFD
                 },
             ],
         };
+
+    public bool Aceitar(string cadeia)
+    {
+        string estadoAtual = _q0;
+        var rastro = new List<string> { estadoAtual };
+
+        foreach (char c in cadeia)
+        {
+            // aplica δ(estadoAtual, c); ausência na tabela indica c ∉ Σ
+            if (!_delta.TryGetValue((estadoAtual, c), out string? proximo))
+            {
+                Console.WriteLine($"  Rastro    : {string.Join(" -> ", rastro)} -> ERRO");
+                Console.WriteLine($"  Motivo    : símbolo '{c}' não pertence ao alfabeto");
+                Console.WriteLine($"  Resultado : REJEITA");
+                return false;
+            }
+            estadoAtual = proximo; // estadoAtual = δ(estadoAtual, c) — passo de transição
+            rastro.Add(estadoAtual);
+        }
+
+        bool aceita = _f.Contains(estadoAtual);
+        Console.WriteLine($"  Rastro    : {string.Join(" -> ", rastro)}");
+        Console.WriteLine($"  Resultado : {(aceita ? "ACEITA" : "REJEITA")}");
+        return aceita;
+    }
+
+    public void ExibirDiagrama()
+    {
+        var estados = _q.OrderBy(e => e).ToList();
+        var simbolos = _sigma.OrderBy(s => s).ToList();
+
+        int larguraEstado = estados.Max(e => e.Length) + 5; // +5 reserva espaço para o prefixo "→ * "
+        int larguraSimbolo = Math.Max(simbolos.Max(_ => 1), 5);
+
+        Console.WriteLine();
+        Console.WriteLine("=== Tabela de Transições ===");
+
+        string cabecalho =
+            "Estado".PadRight(larguraEstado)
+            + "| "
+            + string.Join(" | ", simbolos.Select(s => s.ToString().PadRight(larguraSimbolo)));
+        Console.WriteLine(cabecalho);
+        Console.WriteLine(
+            new string('-', larguraEstado)
+                + "+"
+                + string.Join("-+-", simbolos.Select(_ => new string('-', larguraSimbolo + 1)))
+        );
+
+        foreach (string estado in estados)
+        {
+            // prefixo identifica estado inicial (→) e estados de aceitação (*)
+            string marcador = (estado == _q0 ? "→ " : "  ") + (_f.Contains(estado) ? "* " : "  ");
+            string linha =
+                (marcador + estado).PadRight(larguraEstado)
+                + "| "
+                + string.Join(
+                    " | ",
+                    simbolos.Select(s =>
+                        // consulta δ(estado, símbolo); "-" se a transição não estiver definida
+                        _delta.TryGetValue((estado, s), out string? dest)
+                            ? dest.PadRight(larguraSimbolo)
+                            : "-".PadRight(larguraSimbolo)
+                    )
+                );
+            Console.WriteLine(linha);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  →  = estado inicial     *  = estado de aceitação");
+    }
 }
