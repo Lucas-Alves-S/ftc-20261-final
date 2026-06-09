@@ -81,23 +81,34 @@ else
     }
 }
 
-static MTConfig ConfiguracaoUnarioPadrao()
-{
-    // TODO: Retornar um MTConfig para a MT que calcula f(n) = n+1 em notação unária.
-    //
-    // Especificação:
-    // - Estados:          ["q0", "qaccept", "qreject"]
-    // - AlfabetoEntrada:  ["1"]
-    // - AlfabetoFita:     ["1", "_"]
-    // - EstadoInicial:    "q0"
-    // - EstadoAceitacao:  "qaccept"
-    // - EstadoRejeicao:   "qreject"
-    // - LimitePassos:     10000
-    //
-    // Transições (2 regras):
-    //   (q0, '1') → (q0,  '1', R)  — percorre os 1s existentes sem alterar
-    //   (q0, '_') → (qaccept, '1', R)  — ao encontrar o branco, escreve '1' e aceita
-    //
-    // Efeito: uma fita com n '1's termina com n+1 '1's.
-    throw new NotImplementedException("TODO: ConfiguracaoUnarioPadrao");
-}
+static MTConfig ConfiguracaoUnarioPadrao() =>
+    new()
+    {
+        Estados = ["q0", "qaccept", "qreject"],
+        AlfabetoEntrada = ["1"],
+        AlfabetoFita = ["1", "_"],
+        EstadoInicial = "q0",
+        EstadoAceitacao = "qaccept",
+        EstadoRejeicao = "qreject",
+        LimitePassos = 10000,
+        Transicoes =
+        [
+            // q0: varre 1s à direita até o branco; acrescenta um '1' ao final
+            new()
+            {
+                Origem = "q0",
+                Simbolo = "1",
+                NovoEstado = "q0",
+                NovoSimbolo = "1",
+                Direcao = "R",
+            },
+            new()
+            {
+                Origem = "q0",
+                Simbolo = "_",
+                NovoEstado = "qaccept",
+                NovoSimbolo = "1",
+                Direcao = "R",
+            },
+        ],
+    };
