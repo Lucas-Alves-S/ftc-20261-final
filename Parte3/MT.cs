@@ -337,26 +337,48 @@ class MT
 
     public bool Aceitar(string cadeia)
     {
-        // TODO: Implementar o loop de simulação da Máquina de Turing.
-        //
-        // 1. Inicializar a fita (Dictionary<int, char>) com os caracteres de `cadeia`
-        //    nas posições 0..cadeia.Length-1. Posições não presentes no dicionário
-        //    são tratadas como Branco ('_').
-        //
-        // 2. Inicializar: estadoAtual = _q0, cabecote = 0, passos = 0.
-        //
-        // 3. Loop principal:
-        //    a. Chamar ExibirPasso(passos, estadoAtual, fita, cabecote) para exibir o passo atual.
-        //    b. Se estadoAtual == _qaccept ou _qreject, sair do loop (máquina parou).
-        //    c. Se passos >= _limitePassos, imprimir mensagem de limite atingido e retornar false.
-        //    d. Ler o símbolo atual da fita em `cabecote` (usar Branco se ausente).
-        //    e. Buscar a transição em _delta para (estadoAtual, simboloAtual).
-        //       Se não existir, imprimir mensagem de rejeição implícita e retornar false.
-        //    f. Aplicar a transição: escrever novoSimbolo na fita, atualizar estadoAtual,
-        //       mover cabecote +1 (direção 'R') ou -1 (direção 'L'), incrementar passos.
-        //
-        // 4. Após o loop, imprimir "ACEITA" ou "REJEITA" e retornar (estadoAtual == _qaccept).
-        throw new NotImplementedException("TODO: Aceitar");
+        // fita inicializada com a cadeia de entrada; posições ausentes lidas como ⊔
+        var fita = new Dictionary<int, char>();
+        for (int i = 0; i < cadeia.Length; i++)
+            fita[i] = cadeia[i];
+
+        string estadoAtual = _q0;
+        int cabecote = 0;
+        int passos = 0;
+
+        while (true)
+        {
+            ExibirPasso(passos, estadoAtual, fita, cabecote);
+
+            if (estadoAtual == _qaccept || estadoAtual == _qreject)
+                break;
+
+            if (passos >= _limitePassos)
+            {
+                Console.WriteLine($"  Resultado : LIMITE DE {_limitePassos} PASSOS ATINGIDO");
+                return false;
+            }
+
+            char simboloAtual = fita.GetValueOrDefault(cabecote, Branco);
+
+            // ausência de transição para (q, s) equivale a rejeição implícita
+            if (!_delta.TryGetValue((estadoAtual, simboloAtual), out var transicao))
+            {
+                Console.WriteLine(
+                    $"  Resultado : REJEITA (transição δ({estadoAtual}, '{simboloAtual}') indefinida)"
+                );
+                return false;
+            }
+
+            fita[cabecote] = transicao.novoSimbolo;
+            estadoAtual = transicao.novoEstado;
+            cabecote += transicao.direcao == 'R' ? 1 : -1;
+            passos++;
+        }
+
+        bool aceita = estadoAtual == _qaccept;
+        Console.WriteLine($"  Resultado : {(aceita ? "ACEITA" : "REJEITA")}");
+        return aceita;
     }
 
     private static void ExibirPasso(
@@ -366,28 +388,27 @@ class MT
         int cabecote
     )
     {
-        // TODO: Exibir o estado atual da simulação em uma linha.
-        //
-        // Chamar MontarFita(fita, cabecote) para obter a representação visual da fita.
-        // Imprimir no formato:
-        //   "  Passo {passo,4}: estado={estado,-10} fita={conteudoFita,-40} cabeçote={cabecote}"
-        throw new NotImplementedException("TODO: ExibirPasso");
+        string conteudoFita = MontarFita(fita, cabecote);
+        Console.WriteLine(
+            $"  Passo {passo, 4}: estado={estado, -10} fita={conteudoFita, -40} cabeçote={cabecote}"
+        );
     }
 
     private static string MontarFita(Dictionary<int, char> fita, int cabecote)
     {
-        // TODO: Construir e retornar a representação visual da fita como string.
-        //
-        // Caso especial: fita vazia (Count == 0) e cabecote == 0 → retornar "[_]".
-        //
-        // Caso geral:
-        // - Calcular min = menor entre as chaves da fita e cabecote.
-        // - Calcular max = maior entre as chaves da fita e cabecote.
-        // - Iterar de min a max; para cada posição i:
-        //     * Ler o char da fita (Branco se ausente).
-        //     * Se i == cabecote, formatar como "[c]"; caso contrário, como "c".
-        // - Retornar todas as partes unidas por espaço.
-        throw new NotImplementedException("TODO: MontarFita");
+        if (fita.Count == 0 && cabecote == 0)
+            return $"[{Branco}]";
+
+        int min = Math.Min(fita.Keys.DefaultIfEmpty(0).Min(), cabecote);
+        int max = Math.Max(fita.Keys.DefaultIfEmpty(0).Max(), cabecote);
+
+        var partes = new List<string>();
+        for (int i = min; i <= max; i++)
+        {
+            char c = fita.GetValueOrDefault(i, Branco);
+            partes.Add(i == cabecote ? $"[{c}]" : c.ToString());
+        }
+        return string.Join(" ", partes);
     }
 
     public void ExibirDiagrama()
