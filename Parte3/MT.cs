@@ -413,27 +413,49 @@ class MT
 
     public void ExibirDiagrama()
     {
-        // TODO: Imprimir a tabela de transições δ formatada como ASCII.
-        //
-        // 1. Ordenar _q (estados) e _gamma (símbolos de fita) alfabeticamente.
-        //
-        // 2. Calcular larguras de coluna:
-        //    - larguraCelula = max(tamanho do maior nome de estado + 5, 12)
-        //    - larguraEstado = tamanho do maior nome de estado + 5
-        //
-        // 3. Imprimir cabeçalho:
-        //    - Linha: "Estado" preenchido à direita até larguraEstado, depois "| " e cada símbolo
-        //      separado por " | ", cada um preenchido até larguraCelula.
-        //    - Separador: traços de larguraEstado + "+" + traços intercalados com "-+-".
-        //
-        // 4. Para cada estado, imprimir uma linha com:
-        //    - Marcador "→ " se é _q0, "  " caso contrário; "* " se é _qaccept, "  " caso contrário.
-        //    - Nome do estado preenchido até larguraEstado.
-        //    - Para cada símbolo: se existe transição em _delta, exibir "(novoEstado,novoSimbolo,direcao)"
-        //      preenchido até larguraCelula; senão exibir "-" preenchido até larguraCelula.
-        //    - Colunas separadas por " | ".
-        //
-        // 5. Imprimir legenda: "  →  = estado inicial     *  = estado de aceitação"
-        throw new NotImplementedException("TODO: ExibirDiagrama");
+        var estados = _q.OrderBy(e => e).ToList();
+        var simbolos = _gamma.OrderBy(s => s).ToList();
+
+        // largura de célula: comporta "(novoEstado, s, D)" — usa o maior nome de estado
+        int maxEstado = _q.Max(e => e.Length);
+        int larguraCelula = Math.Max(maxEstado + 5, 12);
+        int larguraEstado = estados.Max(e => e.Length) + 5;
+
+        Console.WriteLine();
+        Console.WriteLine("=== Tabela de Transições ===");
+
+        string cabecalho =
+            "Estado".PadRight(larguraEstado)
+            + "| "
+            + string.Join(" | ", simbolos.Select(s => s.ToString().PadRight(larguraCelula)));
+        Console.WriteLine(cabecalho);
+        Console.WriteLine(
+            new string('-', larguraEstado)
+                + "+"
+                + string.Join("-+-", simbolos.Select(_ => new string('-', larguraCelula + 1)))
+        );
+
+        foreach (string estado in estados)
+        {
+            // prefixo: → estado inicial, * estado de aceitação
+            string marcador = (estado == _q0 ? "→ " : "  ") + (estado == _qaccept ? "* " : "  ");
+            string linha =
+                (marcador + estado).PadRight(larguraEstado)
+                + "| "
+                + string.Join(
+                    " | ",
+                    simbolos.Select(s =>
+                        _delta.TryGetValue((estado, s), out var t)
+                            ? $"({t.novoEstado},{t.novoSimbolo},{t.direcao})".PadRight(
+                                larguraCelula
+                            )
+                            : "-".PadRight(larguraCelula)
+                    )
+                );
+            Console.WriteLine(linha);
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("  →  = estado inicial     *  = estado de aceitação");
     }
 }
