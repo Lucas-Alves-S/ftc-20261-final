@@ -41,36 +41,42 @@ class AFD
             EstadosAceitacao = ["q2"],
             Transicoes =
             [
+                // δ(q0,'a')=q1 — leu 'a'; pode ser início de 'ab'
                 new()
                 {
                     Origem = "q0",
                     Simbolo = "a",
                     Destino = "q1",
                 },
+                // δ(q0,'b')=q0 — leu 'b' sem 'a' anterior; nenhum progresso
                 new()
                 {
                     Origem = "q0",
                     Simbolo = "b",
                     Destino = "q0",
                 },
+                // δ(q1,'a')=q1 — novo 'a'; mantém a esperança de completar 'ab'
                 new()
                 {
                     Origem = "q1",
                     Simbolo = "a",
                     Destino = "q1",
                 },
+                // δ(q1,'b')=q2 — leu 'b' após 'a'; completou sufixo 'ab'
                 new()
                 {
                     Origem = "q1",
                     Simbolo = "b",
                     Destino = "q2",
                 },
+                // δ(q2,'a')=q1 — leu 'a' após 'ab'; possível novo sufixo
                 new()
                 {
                     Origem = "q2",
                     Simbolo = "a",
                     Destino = "q1",
                 },
+                // δ(q2,'b')=q0 — leu 'b' após 'ab'; sufixo quebrado
                 new()
                 {
                     Origem = "q2",

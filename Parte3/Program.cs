@@ -94,6 +94,7 @@ static MTConfig ConfiguracaoUnarioPadrao() =>
         Transicoes =
         [
             // q0: varre 1s à direita até o branco; acrescenta um '1' ao final
+            // δ(q0,'1')=(q0,'1',R) — mantém '1'; avança cabeçote até o fim da fita
             new()
             {
                 Origem = "q0",
@@ -102,6 +103,7 @@ static MTConfig ConfiguracaoUnarioPadrao() =>
                 NovoSimbolo = "1",
                 Direcao = "R",
             },
+            // δ(q0,'_')=(qaccept,'1',R) — branco encontrado; escreve '1' extra (resultado n+1) e aceita
             new()
             {
                 Origem = "q0",

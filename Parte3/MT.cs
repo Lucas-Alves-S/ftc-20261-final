@@ -64,6 +64,7 @@ class MT
             Transicoes =
             [
                 // q0: varre à direita procurando 'a' não marcado
+                // δ(q0,A)=(q0,A,R) — pula 'A' já marcado; continua buscando 'a'
                 new()
                 {
                     Origem = "q0",
@@ -72,6 +73,7 @@ class MT
                     NovoSimbolo = "A",
                     Direcao = "R",
                 },
+                // δ(q0,a)=(q1,A,R) — marca 'a'→'A'; inicia rodada de marcação
                 new()
                 {
                     Origem = "q0",
@@ -80,6 +82,7 @@ class MT
                     NovoSimbolo = "A",
                     Direcao = "R",
                 },
+                // δ(q0,B)=(q4,B,R) — sem mais 'a' para marcar; passa para verificação final
                 new()
                 {
                     Origem = "q0",
@@ -88,6 +91,7 @@ class MT
                     NovoSimbolo = "B",
                     Direcao = "R",
                 },
+                // δ(q0,_)=(qreject,_,R) — fita vazia; n=0 não satisfaz n≥1
                 new()
                 {
                     Origem = "q0",
@@ -96,6 +100,7 @@ class MT
                     NovoSimbolo = "_",
                     Direcao = "R",
                 },
+                // δ(q0,b)=(qreject,b,R) — 'b' antes de 'a'; ordem inválida
                 new()
                 {
                     Origem = "q0",
@@ -104,6 +109,7 @@ class MT
                     NovoSimbolo = "b",
                     Direcao = "R",
                 },
+                // δ(q0,c)=(qreject,c,R) — 'c' antes de 'a'; ordem inválida
                 new()
                 {
                     Origem = "q0",
@@ -112,6 +118,7 @@ class MT
                     NovoSimbolo = "c",
                     Direcao = "R",
                 },
+                // δ(q0,C)=(qreject,C,R) — 'C' marcado sem 'A' correspondente; inválido
                 new()
                 {
                     Origem = "q0",
@@ -121,6 +128,7 @@ class MT
                     Direcao = "R",
                 },
                 // q1: marcou a→A; varre à direita procurando 'b' não marcado
+                // δ(q1,a)=(q1,a,R) — pula 'a' não marcado; ainda na zona dos a's
                 new()
                 {
                     Origem = "q1",
@@ -129,6 +137,7 @@ class MT
                     NovoSimbolo = "a",
                     Direcao = "R",
                 },
+                // δ(q1,B)=(q1,B,R) — pula 'B' já marcado; busca próximo 'b'
                 new()
                 {
                     Origem = "q1",
@@ -137,6 +146,7 @@ class MT
                     NovoSimbolo = "B",
                     Direcao = "R",
                 },
+                // δ(q1,b)=(q2,B,R) — marca 'b'→'B'; par a-b encontrado
                 new()
                 {
                     Origem = "q1",
@@ -145,6 +155,7 @@ class MT
                     NovoSimbolo = "B",
                     Direcao = "R",
                 },
+                // δ(q1,c)=(qreject,c,R) — 'c' antes de 'b'; ordem inválida
                 new()
                 {
                     Origem = "q1",
@@ -153,6 +164,7 @@ class MT
                     NovoSimbolo = "c",
                     Direcao = "R",
                 },
+                // δ(q1,C)=(qreject,C,R) — 'C' marcado sem 'b' correspondente; inválido
                 new()
                 {
                     Origem = "q1",
@@ -161,6 +173,7 @@ class MT
                     NovoSimbolo = "C",
                     Direcao = "R",
                 },
+                // δ(q1,_)=(qreject,_,R) — fita acabou sem 'b'; desequilíbrio a>b
                 new()
                 {
                     Origem = "q1",
@@ -170,6 +183,7 @@ class MT
                     Direcao = "R",
                 },
                 // q2: marcou b→B; varre à direita procurando 'c' não marcado
+                // δ(q2,b)=(q2,b,R) — pula 'b' não marcado; ainda na zona dos b's
                 new()
                 {
                     Origem = "q2",
@@ -178,6 +192,7 @@ class MT
                     NovoSimbolo = "b",
                     Direcao = "R",
                 },
+                // δ(q2,C)=(q2,C,R) — pula 'C' já marcado; busca próximo 'c'
                 new()
                 {
                     Origem = "q2",
@@ -186,6 +201,7 @@ class MT
                     NovoSimbolo = "C",
                     Direcao = "R",
                 },
+                // δ(q2,c)=(q3,C,L) — marca 'c'→'C'; trípla a-b-c marcada; retorna ao início
                 new()
                 {
                     Origem = "q2",
@@ -194,6 +210,7 @@ class MT
                     NovoSimbolo = "C",
                     Direcao = "L",
                 },
+                // δ(q2,a)=(qreject,a,R) — 'a' intercalado na zona dos b's; inválido
                 new()
                 {
                     Origem = "q2",
@@ -202,6 +219,7 @@ class MT
                     NovoSimbolo = "a",
                     Direcao = "R",
                 },
+                // δ(q2,A)=(qreject,A,R) — 'A' marcado na zona de b's; estrutura inválida
                 new()
                 {
                     Origem = "q2",
@@ -210,6 +228,7 @@ class MT
                     NovoSimbolo = "A",
                     Direcao = "R",
                 },
+                // δ(q2,_)=(qreject,_,R) — fita acabou sem 'c'; desequilíbrio b>c
                 new()
                 {
                     Origem = "q2",
@@ -219,6 +238,7 @@ class MT
                     Direcao = "R",
                 },
                 // q3: marcou c→C; varre à esquerda de volta ao branco inicial
+                // δ(q3,C)=(q3,C,L) — pula 'C' marcado; segue voltando à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -227,6 +247,7 @@ class MT
                     NovoSimbolo = "C",
                     Direcao = "L",
                 },
+                // δ(q3,c)=(q3,c,L) — pula 'c' não marcado; segue à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -235,6 +256,7 @@ class MT
                     NovoSimbolo = "c",
                     Direcao = "L",
                 },
+                // δ(q3,B)=(q3,B,L) — pula 'B' marcado; segue voltando à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -243,6 +265,7 @@ class MT
                     NovoSimbolo = "B",
                     Direcao = "L",
                 },
+                // δ(q3,b)=(q3,b,L) — pula 'b' não marcado; segue à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -251,6 +274,7 @@ class MT
                     NovoSimbolo = "b",
                     Direcao = "L",
                 },
+                // δ(q3,A)=(q3,A,L) — pula 'A' marcado; segue voltando à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -259,6 +283,7 @@ class MT
                     NovoSimbolo = "A",
                     Direcao = "L",
                 },
+                // δ(q3,a)=(q3,a,L) — pula 'a' não marcado; segue à esquerda
                 new()
                 {
                     Origem = "q3",
@@ -267,6 +292,7 @@ class MT
                     NovoSimbolo = "a",
                     Direcao = "L",
                 },
+                // δ(q3,_)=(q0,_,R) — chegou ao branco inicial; reinicia iteração
                 new()
                 {
                     Origem = "q3",
@@ -276,6 +302,7 @@ class MT
                     Direcao = "R",
                 },
                 // q4: sem mais a's; verifica que só restam B's, C's e branco
+                // δ(q4,B)=(q4,B,R) — pula 'B' marcado; verifica se resta algo desmarcado
                 new()
                 {
                     Origem = "q4",
@@ -284,6 +311,7 @@ class MT
                     NovoSimbolo = "B",
                     Direcao = "R",
                 },
+                // δ(q4,C)=(q4,C,R) — pula 'C' marcado; verifica se resta algo desmarcado
                 new()
                 {
                     Origem = "q4",
@@ -292,6 +320,7 @@ class MT
                     NovoSimbolo = "C",
                     Direcao = "R",
                 },
+                // δ(q4,_)=(qaccept,_,R) — apenas marcados restaram; aceita
                 new()
                 {
                     Origem = "q4",
@@ -300,6 +329,7 @@ class MT
                     NovoSimbolo = "_",
                     Direcao = "R",
                 },
+                // δ(q4,b)=(qreject,b,R) — 'b' desmarcado sobrou; desequilíbrio
                 new()
                 {
                     Origem = "q4",
@@ -308,6 +338,7 @@ class MT
                     NovoSimbolo = "b",
                     Direcao = "R",
                 },
+                // δ(q4,c)=(qreject,c,R) — 'c' desmarcado sobrou; desequilíbrio
                 new()
                 {
                     Origem = "q4",
@@ -316,6 +347,7 @@ class MT
                     NovoSimbolo = "c",
                     Direcao = "R",
                 },
+                // δ(q4,a)=(qreject,a,R) — 'a' desmarcado na fase final; inválido
                 new()
                 {
                     Origem = "q4",
@@ -324,6 +356,7 @@ class MT
                     NovoSimbolo = "a",
                     Direcao = "R",
                 },
+                // δ(q4,A)=(qreject,A,R) — 'A' marcado sem par B/C; inválido
                 new()
                 {
                     Origem = "q4",
