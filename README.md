@@ -24,6 +24,20 @@ ftc-20261-final/
 
 ---
 
+## Pré-requisitos
+
+Este projeto requer o **.NET 10 SDK** (ou superior).
+
+- Download oficial: [https://dotnet.microsoft.com/en-us/download/dotnet/10.0](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+
+Verifique a instalação com:
+
+```bash
+dotnet --version
+```
+
+---
+
 ## Parte 1 — Autômato Finito Determinístico (AFD)
 
 **Linguagem:** L1 = { w ∈ {a,b}* | w termina com "ab" }
