@@ -4,7 +4,6 @@ namespace Parte3;
 class MT
 {
     private readonly HashSet<string> _q;
-    private readonly HashSet<char> _sigma;
     private readonly HashSet<char> _gamma;
     private readonly Dictionary<
         (string estado, char simbolo),
@@ -17,18 +16,6 @@ class MT
 
     public const char Branco = '_';
 
-    public IReadOnlySet<string> Q => _q;
-    public IReadOnlySet<char> Sigma => _sigma;
-    public IReadOnlySet<char> Gamma => _gamma;
-    public IReadOnlyDictionary<
-        (string estado, char simbolo),
-        (string novoEstado, char novoSimbolo, char direcao)
-    > Delta => _delta;
-    public string Q0 => _q0;
-    public string Qaccept => _qaccept;
-    public string Qreject => _qreject;
-    public int LimitePassos => _limitePassos;
-
     // Sem configuração → fallback L4 = { aⁿbⁿcⁿ | n ≥ 1 }
     public MT()
         : this(ConfiguracaoL4Padrao()) { }
@@ -36,9 +23,6 @@ class MT
     public MT(MTConfig config)
     {
         _q = new HashSet<string>(config.Estados);
-        _sigma = new HashSet<char>(
-            config.AlfabetoEntrada.Where(s => s.Length == 1).Select(s => s[0])
-        );
         _gamma = new HashSet<char>(config.AlfabetoFita.Where(s => s.Length == 1).Select(s => s[0]));
         _delta = [];
         _q0 = config.EstadoInicial;

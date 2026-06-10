@@ -9,12 +9,6 @@ class AFD
     private readonly string _q0;
     private readonly HashSet<string> _f;
 
-    public IReadOnlySet<string> Q => _q;
-    public IReadOnlySet<char> Sigma => _sigma;
-    public IReadOnlyDictionary<(string estado, char simbolo), string> Delta => _delta;
-    public string Q0 => _q0;
-    public IReadOnlySet<string> F => _f;
-
     // Sem configuração → fallback L1 = { w ∈ {a,b}^* | w termina com 'ab' }
     public AFD()
         : this(ConfiguracaoL1Padrao()) { }
