@@ -133,4 +133,4 @@ dotnet run
 
 ## Video explicativo
 
-[![Assista no YouTube](https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg)](https://www.youtube.com/watch?v=dQw4w9WgXcQ)
+[![Assista no YouTube](https://img.youtube.com/vi/TKyYo43c0Yw/maxresdefault.jpg)](https://www.youtube.com/watch?v=TKyYo43c0Yw)
